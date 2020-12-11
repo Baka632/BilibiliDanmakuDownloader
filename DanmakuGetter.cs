@@ -40,10 +40,7 @@ namespace BilibiliDanmakuDownloader
                 await jsonFile.DeleteAsync();
 
 
-                string site = $"http://comment.bilibili.com/{cid}.xml";
-                DownloadOperation download = downloader.CreateDownload(new Uri(site), saveFile);
-                await download.StartAsync();
-                ShowInfoBar(saveFile.Path);
+                GetDanmaku(cid,true,saveFile);
             }
             catch (Exception ex)
             {
@@ -118,10 +115,7 @@ namespace BilibiliDanmakuDownloader
                 int cid = int.Parse(jProperty.Value.ToString());
                 await jsonFile.DeleteAsync();
 
-                string site = $"http://comment.bilibili.com/{cid}.xml";
-                string fileName = $"{cid}.xml";
-                DownloadOperation download = downloader.CreateDownload(new Uri(site), saveFile);
-                await download.StartAsync();
+                GetDanmaku(cid, true, saveFile);
                 ShowInfoBar(saveFile.Path);
             }
             catch (Exception ex)
