@@ -15,6 +15,7 @@ using Windows.UI.Xaml;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Microsoft.UI.Xaml.Controls;
+using System.Text.RegularExpressions;
 
 namespace BilibiliDanmakuDownloader
 {
@@ -106,11 +107,32 @@ namespace BilibiliDanmakuDownloader
             try
             {
                 BackgroundDownloader downloader = new BackgroundDownloader();
-                DownloadOperation downloadRawCidData = downloader.CreateDownload(new Uri($"https://api.bilibili.com/x/player/pagelist?bvid={bvid}"), await ApplicationData.Current.TemporaryFolder.CreateFileAsync(bvid));
+                DownloadOperation downloadRawCidData = downloader.CreateDownload(new Uri($"https://api.bilibili.com/x/player/pagelist?bvid={bvid}"), await ApplicationData.Current.TemporaryFolder.CreateFileAsync(bvid, CreationCollisionOption.ReplaceExisting));
                 await downloadRawCidData.StartAsync();
                 StorageFile jsonFile = await ApplicationData.Current.TemporaryFolder.GetFileAsync(bvid);
-                string rawCidData = File.ReadAllText(jsonFile.Path).Replace("[", "").Replace("]", "").Trim();
-                JObject jObject = JObject.Parse(rawCidData);
+                string rawCidData = File.ReadAllText(jsonFile.Path).Replace("[", "").Replace("]", "");
+                rawCidData = rawCidData.Remove(rawCidData.Length - 1, 0).Remove(0, 0).Trim();
+                JToken jToken = JToken.Parse(rawCidData);
+                JToken jToken1 = null;
+                using (JsonReader reader = jToken.CreateReader())
+                {
+                    while (reader.Read())
+                    {
+                        if (reader.Value != null)
+                        {
+                            if (reader.TokenType == JsonToken.PropertyName)
+                            {
+                                Regex reg = new Regex(@"" + "data" + "$");
+                                //SelectToken(Path)方法可查找某路径下的节点，在Newtonsoft.Json 4.5 版本中不可使用正则匹配，在6.0版本中可用使用，会方便很多，6.0版本下替换值会更方便，这个需要特别注意的
+                                if (reg.IsMatch(reader.Path))
+                                {
+                                    jToken1 = jToken.SelectToken(reader.Path);
+                                }
+                            }
+                        }
+                    }
+                }
+                JObject jObject = (JObject)jToken1;
                 JProperty jProperty = jObject.Property("cid");
                 int cid = int.Parse(jProperty.Value.ToString());
                 await jsonFile.DeleteAsync();
@@ -121,6 +143,7 @@ namespace BilibiliDanmakuDownloader
             catch (Exception ex)
             {
                 ShowInfoBar(ex);
+                await saveFile.DeleteAsync();
             }
         }
     }
