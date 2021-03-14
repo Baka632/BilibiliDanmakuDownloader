@@ -51,28 +51,9 @@ namespace BilibiliDanmakuDownloader
             fileSavePicker.FileTypeChoices.Add("XML文件", new List<string>() { ".xml" });
             switch (IdProperty)
             {
-                case "AV号":
-                    long aid;
-                    if (long.TryParse(idTextBox.Text.ToLower().Replace("av", "").Trim(), out aid))
-                    {
-                        fileSavePicker.SuggestedFileName = $"{aid}";
-                        StorageFile file = await fileSavePicker.PickSaveFileAsync();
-                        if (file != null)
-                        {
-                            danmakuGetter.GetDanmaku(aid, file);
-                        }
-                        else
-                        {
-                            appInfomation.InfoBarSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Warning;
-                            appInfomation.InfoBarTitle = "已取消操作";
-                            appInfomation.InfoBarMessage = "";
-                            appInfomation.IsInfoBarOpen = true;
-                        }
-                    }
-                    break;
                 case "CID":
-                    long cid;
-                    if (long.TryParse(idTextBox.Text, out cid))
+                    int cid;
+                    if (int.TryParse(idTextBox.Text, out cid))
                     {
                         fileSavePicker.SuggestedFileName = $"{cid}";
                         await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, async () =>
@@ -98,19 +79,24 @@ namespace BilibiliDanmakuDownloader
                     break;
                 case "BV号":
                     string bvid = idTextBox.Text;
-                    fileSavePicker.SuggestedFileName = $"{bvid}";
-                    StorageFile storageFile1 = await fileSavePicker.PickSaveFileAsync();
-                    if (storageFile1 != null)
+                    await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal,async () =>
                     {
-                        danmakuGetter.GetDanmaku(bvid, storageFile1);
-                    }
-                    else
-                    {
-                        appInfomation.InfoBarSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Warning;
-                        appInfomation.InfoBarTitle = "已取消操作";
-                        appInfomation.InfoBarMessage = "已取消操作";
-                        appInfomation.IsInfoBarOpen = true;
-                    }
+                        FolderPicker folderPicker = new FolderPicker();
+                        folderPicker.FileTypeFilter.Add("*");
+                        folderPicker.CommitButtonText = "选择下载文件夹";
+                        StorageFolder saveFolder = await folderPicker.PickSingleFolderAsync();
+                        if (folderPicker != null)
+                        {
+                            danmakuGetter.GetDanmaku(bvid, saveFolder);
+                        }
+                        else
+                        {
+                            appInfomation.InfoBarSeverity = Microsoft.UI.Xaml.Controls.InfoBarSeverity.Warning;
+                            appInfomation.InfoBarTitle = "已取消操作";
+                            appInfomation.InfoBarMessage = "已取消操作";
+                            appInfomation.IsInfoBarOpen = true;
+                        }
+                    });
                     break;
             }
         }
@@ -124,6 +110,7 @@ namespace BilibiliDanmakuDownloader
                 CheckidTextBoxValue();
             }
         }
+
 
         private void idTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {

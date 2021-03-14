@@ -23,15 +23,14 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <TextBox x:Name="idTextBox" VerticalAlignment="Bottom" PlaceholderText="请输入视频ID" TextChanged="idTextBox_TextChanged" Height="33" Width="132"/>
-                    <ComboBox x:Name="idComboBox" Grid.Column="1" SelectedItem="AV号" Header="输入ID类型" Margin="10,0,0,0" SelectionChanged="ComboBox_SelectionChanged">
-                        <x:String>AV号</x:String>
+                    <ComboBox x:Name="idComboBox" Grid.Column="1" SelectedItem="BV号" Header="输入ID类型" Margin="10,0,0,0" SelectionChanged="ComboBox_SelectionChanged">
                         <x:String>BV号</x:String>
                         <x:String>CID</x:String>
                     </ComboBox>
                 </Grid>
                 <Button x:Name="getDanmakuButton" HorizontalAlignment="Center" Content="获取弹幕" Click="GetDanmaku" IsEnabled="False"/>
             </StackPanel>
-            <TextBlock Text="注意:如果获取到的弹幕文件不正确,请检查你输入的是AV号还是CID。" FontWeight="ExtraLight" Grid.Row="1" Margin="0,15,0,0"/>
+            <TextBlock Text="注意:AV号因B站相关API原因,暂时无法通过AV号获取弹幕文件。" FontWeight="ExtraLight" Grid.Row="1" Margin="0,15,0,0"/>
         </Grid>
 
         <controls:InfoBar
