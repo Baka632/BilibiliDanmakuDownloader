@@ -7,7 +7,7 @@
   IgnorableNamespaces="uap mp">
 
   <Identity
-    Name="cc1ff076-ef5a-4708-9b37-847a10b6497e"
+    Name="Baka632.BilibiliDanmakuDownloader"
     Publisher="CN=Baka632"
     Version="1.0.0.0" />
 
